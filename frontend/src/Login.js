@@ -39,7 +39,8 @@ const Login = ({ onLoginSuccess }) => {
         <GoogleLogin
           onSuccess={credentialResponse => {
             let accessToken = credentialResponse.credential;
-            onLoginSuccess(accessToken);
+            console.log({accessToken});
+            onLoginSuccess({accessToken});
           }}
           onError={handleGoogleLoginFail}
         />
