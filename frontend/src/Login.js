@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { GoogleAuthProvider } from "firebase/auth";
-import { Button } from 'react-bootstrap';
+import { TextField, Button, Typography, Snackbar, Alert } from '@mui/material';
 
 const provider = new GoogleAuthProvider();
 
@@ -11,6 +11,7 @@ const Login = ({ onLoginSuccess }) => {
   const [loginFailMessage, setLoginFailMessage] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   const handleGoogleLoginFail = () => {
     setLoginFailMessage('Failed to login to Google. Please try again.');
@@ -29,24 +30,41 @@ const Login = ({ onLoginSuccess }) => {
       });
   };
 
-  return (
-    <div className="login-overlay container">
-      <div className="login-container card p-4">
-        <h2>Login</h2>
-        {loginFailMessage && (
-          <div className="alert alert-danger">{loginFailMessage}</div>
-        )}
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
 
+  return (
+    <div className="login-overlay">
+      <div className="login-container card p-4">
+        <Typography variant="h4" gutterBottom>Login</Typography>
+        {loginFailMessage && (
+          <Snackbar open={true} autoHideDuration={6000} onClose={handleSnackbarClose}>
+            <Alert severity="error">{loginFailMessage}</Alert>
+          </Snackbar>
+        )}
         <form onSubmit={handleEmailLogin}>
-          <div className="mb-3">
-            <label htmlFor="email" className="form-label">Email address</label>
-            <input type="email" className="form-control" id="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="password" className="form-label">Password</label>
-            <input type="password" className="form-control" id="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-          </div>
-          <button type="submit" className="btn btn-primary mb-3">Login with Email/Password</button>
+          <TextField
+            label="Email address"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            label="Password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            fullWidth
+            margin="normal"
+          />
+          <Button type="submit" variant="contained" color="primary" fullWidth>
+            Login with Email/Password
+          </Button>
         </form>
 
         <Button
