@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { GoogleAuthProvider } from "firebase/auth";
+import { Button } from 'react-bootstrap';
 
+const provider = new GoogleAuthProvider();
+
+const auth = getAuth();
 const Login = ({ onLoginSuccess }) => {
   const [loginFailMessage, setLoginFailMessage] = useState('');
   const [email, setEmail] = useState('');
@@ -12,13 +18,24 @@ const Login = ({ onLoginSuccess }) => {
 
   const handleEmailLogin = (e) => {
     e.preventDefault();
-    // TODO: Implement email/password login logic here
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Signed in 
+        console.log("user", userCredential.user)
+        onLoginSuccess(userCredential.user);
+      })
+      .catch((error) => {
+        setLoginFailMessage(error.message);
+      });
   };
 
   return (
     <div className="login-overlay container">
       <div className="login-container card p-4">
         <h2>Login</h2>
+        {loginFailMessage && (
+          <div className="alert alert-danger">{loginFailMessage}</div>
+        )}
 
         <form onSubmit={handleEmailLogin}>
           <div className="mb-3">
@@ -32,18 +49,33 @@ const Login = ({ onLoginSuccess }) => {
           <button type="submit" className="btn btn-primary mb-3">Login with Email/Password</button>
         </form>
 
-        {loginFailMessage && (
-          <div className="alert alert-danger">{loginFailMessage}</div>
-        )}
-
-        <GoogleLogin
-          onSuccess={credentialResponse => {
-            let accessToken = credentialResponse.credential;
-            console.log({accessToken});
-            onLoginSuccess({accessToken});
+        <Button
+          onClick={() => {
+            signInWithPopup(auth, provider)
+            .then((result) => {
+              onLoginSuccess(result.user);
+            })
+            .catch((error) => handleGoogleLoginFail());
           }}
-          onError={handleGoogleLoginFail}
-        />
+          variant="secondary"
+        >
+          Login with Google
+        </Button>
+        <Button
+          onClick={() => {
+            createUserWithEmailAndPassword(auth, email, password)
+              .then((userCredential) => {
+                // Signed in 
+                onLoginSuccess(userCredential.user);
+              })
+              .catch((error) => {
+                setLoginFailMessage(error.message);
+              });
+          }}
+          variant="secondary"
+        >
+          create account
+        </Button>
       </div>
     </div>
   );
