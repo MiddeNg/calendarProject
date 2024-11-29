@@ -6,7 +6,7 @@ import Button from '@mui/material/Button';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateTimePicker  } from '@mui/x-date-pickers/DateTimePicker';
-import { FormControlLabel, Switch } from '@mui/material';
+import { Alert, FormControlLabel, Switch } from '@mui/material';
 
 function CreateEventView({ handleAddEventClick, showEvents, selectedDate }) {
   const [newEvent, setNewEvent] = useState({
@@ -16,6 +16,8 @@ function CreateEventView({ handleAddEventClick, showEvents, selectedDate }) {
     endDateTime: null,
     isFullDay: false,
   });
+
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     if (selectedDate) {
@@ -48,6 +50,10 @@ function CreateEventView({ handleAddEventClick, showEvents, selectedDate }) {
   };
 
   const handleAddClick = () => {
+    if (!newEvent.name || !newEvent.description || !newEvent.startDateTime || !newEvent.endDateTime) {
+      setErrorMessage('Please fill in all fields.');
+      return;
+    }
     handleAddEventClick(newEvent);
     // Clear the input fields after adding the event
     setNewEvent({
@@ -61,8 +67,10 @@ function CreateEventView({ handleAddEventClick, showEvents, selectedDate }) {
 
   return (
     <List>
+      {errorMessage && <Alert severity="error" className="mt-3">{errorMessage}</Alert>}
       <ListItem>
         <TextField
+          required
           label="Name"
           value={newEvent.name}
           onChange={(e) => setNewEvent({ ...newEvent, name: e.target.value })}
@@ -70,6 +78,7 @@ function CreateEventView({ handleAddEventClick, showEvents, selectedDate }) {
       </ListItem>
       <ListItem>
         <TextField
+          required
           label="Description"
           value={newEvent.description}
           onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
@@ -78,7 +87,7 @@ function CreateEventView({ handleAddEventClick, showEvents, selectedDate }) {
       <ListItem>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DateTimePicker 
-            renderInput={(props) => <TextField {...props} />}
+            renderInput={(props) => <TextField {...props} required />}
             label="Start Date and Time"
             value={newEvent.startDateTime}
             onChange={handleStartDateTimeChange}
@@ -88,11 +97,10 @@ function CreateEventView({ handleAddEventClick, showEvents, selectedDate }) {
       <ListItem>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DateTimePicker 
-            renderInput={(props) => <TextField {...props} />}
+            renderInput={(props) => <TextField {...props} required disabled={newEvent.isFullDay} />}
             label="End Date and Time"
             value={newEvent.endDateTime}
             onChange={handleEndDateTimeChange}
-            disabled={newEvent.isFullDay}
           />
         </LocalizationProvider>
       </ListItem>
