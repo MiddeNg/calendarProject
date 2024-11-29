@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { GoogleLogin } from '@react-oauth/google';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { GoogleAuthProvider } from "firebase/auth";
-import { TextField, Button, Typography, Snackbar, Alert } from '@mui/material';
+import { TextField, Button, Typography, Alert } from '@mui/material';
+import backendService from './backend';
 
 const provider = new GoogleAuthProvider();
 
@@ -11,27 +11,29 @@ const Login = ({ onLoginSuccess }) => {
   const [loginFailMessage, setLoginFailMessage] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
 
-  const handleGoogleLoginFail = () => {
-    setLoginFailMessage('Failed to login to Google. Please try again.');
-  };
-
-  const handleEmailLogin = (e) => {
-    e.preventDefault();
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // Signed in 
-        console.log("user", userCredential.user)
+  const handleGoogleLogin = async () => {
+      try {
+        const userCredential = await signInWithPopup(auth, provider);
+        await backendService.login(userCredential.user.getIdToken()); 
         onLoginSuccess(userCredential.user);
-      })
-      .catch((error) => {
-        setLoginFailMessage(error.message);
-      });
-  };
+      } catch (error) {
+        let defaultErrorMessage = 'Failed to login. Please try again.';
+        setLoginFailMessage(error.message ?? error.statusText ?? defaultErrorMessage);
+      }
+    }
 
-  const handleSnackbarClose = () => {
-    setSnackbarOpen(false);
+  const handleEmailLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      // Signed in
+      await backendService.login(userCredential.user.getIdToken()); 
+      onLoginSuccess(userCredential.user);
+    } catch (error) {
+        let defaultErrorMessage = 'Failed to login. Please try again.';
+        setLoginFailMessage(error.message ?? error.statusText ?? defaultErrorMessage);
+    }
   };
 
   return (
@@ -39,9 +41,7 @@ const Login = ({ onLoginSuccess }) => {
       <div className="login-container card p-4">
         <Typography variant="h4" gutterBottom>Login</Typography>
         {loginFailMessage && (
-          <Snackbar open={true} autoHideDuration={6000} onClose={handleSnackbarClose}>
-            <Alert severity="error">{loginFailMessage}</Alert>
-          </Snackbar>
+          <Alert severity="error" className="mt-3">{loginFailMessage}</Alert>
         )}
         <form onSubmit={handleEmailLogin}>
           <TextField
@@ -68,27 +68,19 @@ const Login = ({ onLoginSuccess }) => {
         </form>
 
         <Button
-          onClick={() => {
-            signInWithPopup(auth, provider)
-            .then((result) => {
-              onLoginSuccess(result.user);
-            })
-            .catch((error) => handleGoogleLoginFail());
-          }}
+          onClick={handleGoogleLogin}
           variant="secondary"
         >
           Login with Google
         </Button>
         <Button
-          onClick={() => {
-            createUserWithEmailAndPassword(auth, email, password)
-              .then((userCredential) => {
-                // Signed in 
-                onLoginSuccess(userCredential.user);
-              })
-              .catch((error) => {
-                setLoginFailMessage(error.message);
-              });
+          onClick={async () => {
+            try {
+              const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+              onLoginSuccess(userCredential.user);
+            } catch (error) {
+              setLoginFailMessage(error.message);
+            }
           }}
           variant="secondary"
         >
@@ -98,5 +90,4 @@ const Login = ({ onLoginSuccess }) => {
     </div>
   );
 };
-
 export default Login;
