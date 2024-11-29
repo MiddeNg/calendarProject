@@ -23,10 +23,6 @@ const App = () => {
     logout();
   };
 
-  const uploadEvent = () => {
-    console.log('Add event clicked');
-  };
-
   return (
     <div className="app">
       <AppBar position="static">
@@ -49,12 +45,12 @@ const App = () => {
           </Grid>
           <Grid item xs={0} size={5} sx={{ display: { lg: 'block', md: 'block', xs: 'none' } }}>
             <Container sx={{ display: { lg: 'block', md: 'block', xs: 'none' }, maxWidth: 'sm' }}>
-              <EventsView uploadEvent={uploadEvent} selectedDate={date} />
+              <EventsView user={user} selectedDate={date}  />
             </Container>
           </Grid>
         </Grid>
         <Drawer sx={{ display: { lg: 'none', md: 'none', xs: 'block' } }} anchor="bottom" open={showSidePanel} onClose={() => setShowSidePanel(false)}>
-          <EventsView uploadEvent={uploadEvent} selectedDate={date} />
+          <EventsView user={user} selectedDate={date} />
         </Drawer>
       </div>
     </div>
