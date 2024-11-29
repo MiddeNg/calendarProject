@@ -1,29 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { List, Button, Paper, Typography } from '@mui/material';
 import CreateEventView from './CreateEventView';
 import Event from './Event';
 import backend from './firebaseBackend';
+import dayjs from 'dayjs';
 
 const EventsView = ({ user, selectedDate }) => {
   const [showCreateEvent, setShowCreateEvent] = useState(false);
-  const [events, setEvents] = useState([]);
+  const [groupedEvents, setGroupedEvents] = useState({});
   const [error, setError] = useState('');
+  const dateRef = React.createRef();
 
   React.useEffect(() => {
     const fetchEvents = async () => {
-      try{
+      try {
         const events = await backend.getAllEvents();
-        setEvents(events);
-      } catch(error) {
+        const groupedEvents = events.reduce((acc, event) => {
+          const startDate = event.startDateTime.format('YYYY-MM-DD');
+          if (!acc[startDate]) {
+            acc[startDate] = [];
+          }
+          acc[startDate].push(event);
+          return acc;
+        }, {})
+        setGroupedEvents(groupedEvents);
+      } catch (error) {
         setError(error.message ?? error.statusText ?? 'Failed to fetch events. Please try again.');
       }
     };
     user && fetchEvents();
   }, [user]);
 
-  const handleAddEventClick = async(event) => {
+  useEffect(() => {
+    if (selectedDate && dateRef.current) {
+      const divs = dateRef.current.querySelectorAll('div.dateCard');
+      const selectedDateStart = selectedDate.startOf('day');
+      const divToShow = Object.values(divs).find((div) => {
+        const key = div.getAttribute('data-key')
+        return dayjs(key).isSame(selectedDateStart) || dayjs(key).isAfter(selectedDateStart)
+      });
+      if (divToShow) {
+        divToShow.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }, [selectedDate, dateRef]);
+  const handleAddEventClick = async (event) => {
     await backend.createEvent(event);
-    setEvents([...events, event]);
+    console.log("event", groupedEvents[event.startDateTime.format('YYYY-MM-DD')])
+    setGroupedEvents(prevState => ({ ...prevState, [event.startDateTime.format('YYYY-MM-DD')]: [...prevState[event.startDateTime.format('YYYY-MM-DD')] ?? [], event] }));
     setShowCreateEvent(false);
   };
 
@@ -36,7 +60,7 @@ const EventsView = ({ user, selectedDate }) => {
       {showCreateEvent ? (
         <CreateEventView
           handleAddEventClick={handleAddEventClick}
-          showEvents={() => setShowCreateEvent(false)} 
+          showEvents={() => setShowCreateEvent(false)}
           selectedDate={selectedDate}
         />
       ) : (
@@ -44,11 +68,21 @@ const EventsView = ({ user, selectedDate }) => {
           <Button onClick={() => setShowCreateEvent(true)} variant="contained" color="primary" style={{ marginBottom: '10px' }}>
             Add Event
           </Button>
-          <List style={{ marginTop: '10px' }}>
-            {error ? <Typography color="error">{error}</Typography> : events.map((event, index) => (
-              <Event key={index} event={event} onEditClick={() => setShowCreateEvent(true)} />
-            ))}
-          </List>
+          <div style={{ maxHeight: '600px', overflowY: 'auto', marginTop: '10px' }}>
+            <List ref={dateRef}>
+              {error ? (
+                <Typography color="error">{error}</Typography>
+              ) : (
+                Object.entries(groupedEvents).sort((a, b) => new Date(a[0]) - new Date(b[0])).map(([date, events]) => (
+                <div key={date} data-key={date} className='dateCard'>
+                  <Typography variant="h6">{date} </Typography>
+                  {events.map((event, index) => (
+                    <Event key={index} event={event} onEditClick={() => setShowCreateEvent(true)} />
+                  ))}
+                </div>
+              )))}
+            </List>
+          </div>
         </>
       )}
     </Paper>
@@ -56,3 +90,4 @@ const EventsView = ({ user, selectedDate }) => {
 };
 
 export default EventsView;
+

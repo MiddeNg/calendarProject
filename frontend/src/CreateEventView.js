@@ -5,7 +5,7 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { DateTimePicker  } from '@mui/x-date-pickers/DateTimePicker';
 import { FormControlLabel, Switch } from '@mui/material';
 
 function CreateEventView({ handleAddEventClick, showEvents, selectedDate }) {
@@ -77,7 +77,7 @@ function CreateEventView({ handleAddEventClick, showEvents, selectedDate }) {
       </ListItem>
       <ListItem>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DateTimePicker
+          <DateTimePicker 
             renderInput={(props) => <TextField {...props} />}
             label="Start Date and Time"
             value={newEvent.startDateTime}
@@ -87,7 +87,7 @@ function CreateEventView({ handleAddEventClick, showEvents, selectedDate }) {
       </ListItem>
       <ListItem>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DateTimePicker
+          <DateTimePicker 
             renderInput={(props) => <TextField {...props} />}
             label="End Date and Time"
             value={newEvent.endDateTime}

@@ -6,10 +6,11 @@ import Drawer from '@mui/material/Drawer';
 import EventsView from './EventsView';
 import { Container, AppBar, Toolbar, Typography, Button } from '@mui/material';
 import Grid from '@mui/material/Grid2';
+import dayjs from 'dayjs';
 
 const App = () => {
   const [user, setUser] = useState(null);
-  const [date, setDate] = useState(null);
+  const [date, setDate] = useState(dayjs());
   const [showSidePanel, setShowSidePanel] = useState(false);
 
   useEffect(() => {
@@ -41,7 +42,7 @@ const App = () => {
       <div className={`main-content ${user ? 'active' : 'inactive'}`}>
         <Grid container spacing={2}>
           <Grid item xs={12} size={7}>
-            <Calendar setDate={setDate} />
+            <Calendar date={date} setDate={setDate} openSidePanel={() => setShowSidePanel(true)} />
           </Grid>
           <Grid item xs={0} size={5} sx={{ display: { lg: 'block', md: 'block', xs: 'none' } }}>
             <Container sx={{ display: { lg: 'block', md: 'block', xs: 'none' }, maxWidth: 'sm' }}>

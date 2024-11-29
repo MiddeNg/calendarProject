@@ -1,4 +1,4 @@
-import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
+import { collection, addDoc, getDocs, query, where, orderBy } from "firebase/firestore";
 import { db } from './firebase';
 import { getAuth } from "firebase/auth";
 import { dayJSToFirestoreTS, firestoreTSToDayJS } from "./utils";
@@ -32,7 +32,7 @@ const firebaseBackend = {
   getAllEvents: async () => {
     const user = getAuth().currentUser
     const eventsRef = collection(db, "events");
-    const q = query(eventsRef, where("uid", "==", user.uid));
+    const q = query(eventsRef, where("uid", "==", user.uid), orderBy("startDateTime", "asc"));
     const querySnapshot = await getDocs(q);
     const events = [];
     querySnapshot.forEach((doc) => {
