@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import TextField from '@mui/material/TextField';
@@ -7,16 +7,21 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { FormControlLabel, Switch } from '@mui/material';
-import dayjs from 'dayjs';
 
-function CreateEventView({ handleAddEventClick }) {
+function CreateEventView({ handleAddEventClick, showEvents, selectedDate }) {
   const [newEvent, setNewEvent] = useState({
     name: '',
     description: '',
-    startDateTime: dayjs(),
+    startDateTime: selectedDate ? selectedDate.startOf('day') : null,
     endDateTime: null,
     isFullDay: false,
   });
+
+  useEffect(() => {
+    if (selectedDate) {
+      setNewEvent({ ...newEvent, startDateTime: selectedDate });
+    }
+  }, [selectedDate]);
 
   const handleStartDateTimeChange = (value) => {
     setNewEvent({ ...newEvent, startDateTime: value });
@@ -99,6 +104,7 @@ function CreateEventView({ handleAddEventClick }) {
       </ListItem>
       <ListItem>
         <Button variant="contained" onClick={handleAddClick}>Add Event</Button>
+        <Button variant="contained" onClick={showEvents}>Cancel</Button>
       </ListItem>
     </List>
   );

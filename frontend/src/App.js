@@ -4,7 +4,7 @@ import Login from './Login';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import Calendar from './Calendar';
 import Drawer from '@mui/material/Drawer';
-import CreateEventView from './CreateEventView';
+import EventsView from './EventsView';
 import { Container } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
@@ -37,7 +37,7 @@ const App = () => {
     setAccessToken(accessToken);
   };
 
-  const handleAddEventClick = () => {
+  const uploadEvent = () => {
     // Logic for adding an event
     console.log('Add event clicked');
   };
@@ -45,20 +45,20 @@ const App = () => {
   return (
     <GoogleOAuthProvider clientId={process.env.REACT_APP_O_AUTH_CLIENT_ID}>
       <div className="app">
-        {!accessToken && <Login onLoginSuccess={onLoginSuccess} />}
-        <div className={`main-content ${accessToken ? 'active' : 'inactive'}`}>
+        {!idToken && <Login onLoginSuccess={onLoginSuccess} />}
+        <div className={`main-content ${idToken ? 'active' : 'inactive'}`}>
           <Grid container spacing={2}>
             <Grid item xs={12} size={7}>
               <Calendar setDate={setDate} />
             </Grid>
             <Grid item xs={0} size={5} sx={{ display: { lg: 'block', md: 'block', xs: 'none' }}}>
               <Container sx={{ display: { lg: 'block', md: 'block', xs: 'none' }, maxWidth: 'sm' }}>
-                <CreateEventView handleAddEventClick={handleAddEventClick} />
+                <EventsView uploadEvent={uploadEvent} selectedDate={date} />
               </Container>
             </Grid>
           </Grid>
           <Drawer sx={{ display: { lg: 'none', md: 'none', xs: 'block' } }} anchor="bottom" open={showSidePanel} onClose={() => setShowSidePanel(false)}>
-            <CreateEventView handleAddEventClick={handleAddEventClick} />
+            <EventsView uploadEvent={uploadEvent} selectedDate={date}/>
           </Drawer>
         </div>
       </div>
