@@ -4,7 +4,7 @@ import Login from './Login';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import Calendar from './Calendar';
 import Drawer from '@mui/material/Drawer';
-import EventsView from './EventsView';
+import CreateEventView from './CreateEventView';
 import { Container } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
@@ -53,12 +53,12 @@ const App = () => {
             </Grid>
             <Grid item xs={0} size={5} sx={{ display: { lg: 'block', md: 'block', xs: 'none' }}}>
               <Container sx={{ display: { lg: 'block', md: 'block', xs: 'none' }, maxWidth: 'sm' }}>
-                <EventsView handleAddEventClick={handleAddEventClick} />
+                <CreateEventView handleAddEventClick={handleAddEventClick} />
               </Container>
             </Grid>
           </Grid>
           <Drawer sx={{ display: { lg: 'none', md: 'none', xs: 'block' } }} anchor="bottom" open={showSidePanel} onClose={() => setShowSidePanel(false)}>
-            <EventsView handleAddEventClick={handleAddEventClick} />
+            <CreateEventView handleAddEventClick={handleAddEventClick} />
           </Drawer>
         </div>
       </div>
