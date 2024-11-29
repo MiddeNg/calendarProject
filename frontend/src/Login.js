@@ -1,38 +1,48 @@
 import React, { useState } from 'react';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import {
+  getAuth, createUserWithEmailAndPassword,
+  signInWithEmailAndPassword, signInWithPopup,
+  setPersistence, browserLocalPersistence,
+  onAuthStateChanged, signOut
+} from "firebase/auth";
 import { GoogleAuthProvider } from "firebase/auth";
 import { TextField, Button, Typography, Alert } from '@mui/material';
-import backendService from './backend';
 
 const provider = new GoogleAuthProvider();
 
 const auth = getAuth();
-const Login = ({ onLoginSuccess }) => {
+const Login = ({ setUser }) => {
   const [loginFailMessage, setLoginFailMessage] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleGoogleLogin = async () => {
-      try {
-        const userCredential = await signInWithPopup(auth, provider);
-        await backendService.login(userCredential.user.getIdToken()); 
-        onLoginSuccess(userCredential.user);
-      } catch (error) {
-        let defaultErrorMessage = 'Failed to login. Please try again.';
-        setLoginFailMessage(error.message ?? error.statusText ?? defaultErrorMessage);
-      }
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      setUser(user);
+    } else {
+      setUser(null);
     }
+  })
+  const handleGoogleLogin = async () => {
+    try {
+      await setPersistence(auth, browserLocalPersistence);
+      await signInWithPopup(auth, provider);
+    } catch (error) {
+      let defaultErrorMessage = 'Failed to login. Please try again.';
+      setLoginFailMessage(error.message ?? error.statusText ?? defaultErrorMessage);
+    }
+  }
 
   const handleEmailLogin = async (e) => {
     e.preventDefault();
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      await setPersistence(auth, browserLocalPersistence);
+      await signInWithEmailAndPassword(auth, email, password);
       // Signed in
-      await backendService.login(userCredential.user.getIdToken()); 
-      onLoginSuccess(userCredential.user);
     } catch (error) {
-        let defaultErrorMessage = 'Failed to login. Please try again.';
-        setLoginFailMessage(error.message ?? error.statusText ?? defaultErrorMessage);
+      console.log(error)
+      let defaultErrorMessage = 'Failed to login. Please try again.';
+      setLoginFailMessage(error.message ?? error.statusText ?? defaultErrorMessage);
     }
   };
 
@@ -76,8 +86,8 @@ const Login = ({ onLoginSuccess }) => {
         <Button
           onClick={async () => {
             try {
-              const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-              onLoginSuccess(userCredential.user);
+              await setPersistence(auth, browserLocalPersistence);
+              await createUserWithEmailAndPassword(auth, email, password);
             } catch (error) {
               setLoginFailMessage(error.message);
             }
@@ -90,4 +100,8 @@ const Login = ({ onLoginSuccess }) => {
     </div>
   );
 };
-export default Login;
+
+const logout = () => {
+  signOut(auth);
+}
+export {Login, logout};
