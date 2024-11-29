@@ -1,13 +1,13 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 const firebaseConfig = {
-  apiKey: "AIzaSyBgOildxi-zV6MRLt5RNPfNlCZNBYzA3vI",
-  authDomain: "phonic-jetty-443009-q8.firebaseapp.com",
-  projectId: "phonic-jetty-443009-q8",
-  storageBucket: "phonic-jetty-443009-q8.firebasestorage.app",
-  messagingSenderId: "674326963056",
-  appId: "1:674326963056:web:7a9d366b84a1cf63c565b5",
-  measurementId: "G-3ZR9T13GBN"
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase
