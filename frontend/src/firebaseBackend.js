@@ -9,7 +9,6 @@ const firebaseBackend = {
     const auth = getAuth();
     let user = auth.currentUser 
     if (!inputEvent || ! inputEvent.name ||
-      ! inputEvent.description ||
       ! inputEvent.startDateTime ||
       ! inputEvent.endDateTime 
     ) {

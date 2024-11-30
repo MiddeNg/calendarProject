@@ -20,7 +20,6 @@ function Calendar({ date, setDate, openSidePanel }) {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <div>
-        <h1>Calendar</h1>
         <StaticDatePicker
           value={date}
           onChange={(date) => {
