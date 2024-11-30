@@ -50,7 +50,23 @@ const App = () => {
             </Container>
           </Grid>
         </Grid>
-        <Drawer sx={{ display: { lg: 'none', md: 'none', xs: 'block' } }} anchor="bottom" open={showSidePanel} onClose={() => setShowSidePanel(false)}>
+        <Drawer
+          sx={{
+            display: { lg: 'none', md: 'none', xs: 'block' },
+            '& .MuiDrawer-paper': {
+              boxSizing: 'border-box',
+              overflow: 'hidden',
+              height: 'calc(100vh - 64px)',
+              backgroundColor: (theme) =>
+                theme.palette.mode === 'light' ? '#fff' : '#121212',
+              padding: 1,
+              borderRadius: 2,
+            },
+          }}
+          anchor="bottom"
+          open={showSidePanel}
+          onClose={() => setShowSidePanel(false)}
+        >
           <EventsView user={user} selectedDate={date} />
         </Drawer>
       </div>

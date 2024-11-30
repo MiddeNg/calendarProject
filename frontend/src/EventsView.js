@@ -58,7 +58,7 @@ const EventsView = ({ user, selectedDate }) => {
     <Paper style={{
       borderRadius: '20px', padding: '20px',
       margin: '20px', width: '80%', maxWidth: '600px',
-      height: '100%',
+      height: '80vh',
     }}>
       {showCreateEvent ? (
         <CreateEventView
@@ -74,7 +74,7 @@ const EventsView = ({ user, selectedDate }) => {
           <Button onClick={() => setShowExportView(true)} variant="contained" color="primary" style={{ marginBottom: '10px' }}>
             Export Events
           </Button>
-          <div style={{ maxHeight: '600px', overflowY: 'auto', marginTop: '10px' }}>
+          <div style={{ maxHeight: '70vh', overflowY: 'auto' , marginTop: '10px' }}>
             <List ref={dateRef}>
               {error ? (
                 <Typography color="error">{error}</Typography>
