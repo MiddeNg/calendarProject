@@ -40,7 +40,7 @@ const EventsView = ({ user, selectedDate }) => {
       const divToShow = Object.values(divs).find((div) => {
         const key = div.getAttribute('data-key')
         return dayjs(key).isSame(selectedDateStart) || dayjs(key).isAfter(selectedDateStart)
-      }) ?? divs.length > 0 ? divs[divs.length - 1] : null;
+      }) ?? (divs.length > 0 ? divs[divs.length - 1] : null);
       if (divToShow) {
         divToShow.scrollIntoView({ behavior: 'smooth' });
       }
