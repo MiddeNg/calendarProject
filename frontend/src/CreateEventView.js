@@ -13,7 +13,7 @@ function CreateEventView({ handleAddEventClick, showEvents, selectedDate }) {
     name: '',
     description: '',
     startDateTime: selectedDate ? selectedDate.startOf('day') : null,
-    endDateTime: null,
+    endDateTime: selectedDate ? selectedDate.startOf('day').add(1, 'day') : null,
     isFullDay: false,
   });
 
@@ -52,7 +52,7 @@ function CreateEventView({ handleAddEventClick, showEvents, selectedDate }) {
   };
 
   const handleAddClick = () => {
-    if (!newEvent.name || !newEvent.description || !newEvent.startDateTime || !newEvent.endDateTime) {
+    if (!newEvent.name  || !newEvent.startDateTime || !newEvent.endDateTime) {
       setErrorMessage('Please fill in all fields.');
       return;
     }
@@ -80,7 +80,6 @@ function CreateEventView({ handleAddEventClick, showEvents, selectedDate }) {
       </ListItem>
       <ListItem>
         <TextField
-          required
           label="Description"
           value={newEvent.description}
           onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
@@ -90,7 +89,7 @@ function CreateEventView({ handleAddEventClick, showEvents, selectedDate }) {
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DateTimePicker 
             renderInput={(props) => <TextField {...props} required />}
-            label="Start Date and Time"
+            label="Start"
             value={newEvent.startDateTime}
             onChange={handleStartDateTimeChange}
           />
@@ -100,7 +99,8 @@ function CreateEventView({ handleAddEventClick, showEvents, selectedDate }) {
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DateTimePicker 
             renderInput={(props) => <TextField {...props} required disabled={newEvent.isFullDay} />}
-            label="End Date and Time"
+            label="End"
+            minDateTime={newEvent.startDateTime}
             value={newEvent.endDateTime}
             onChange={handleEndDateTimeChange}
           />
