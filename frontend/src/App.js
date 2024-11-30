@@ -6,7 +6,6 @@ import Drawer from '@mui/material/Drawer';
 import EventsView from './EventsView';
 import { Container, AppBar, Toolbar, Typography, Button } from '@mui/material';
 import Grid from '@mui/material/Grid2';
-import dayjs from 'dayjs';
 
 const App = () => {
   const [user, setUser] = useState(null);
