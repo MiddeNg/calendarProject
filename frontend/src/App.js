@@ -56,7 +56,7 @@ const App = () => {
             '& .MuiDrawer-paper': {
               boxSizing: 'border-box',
               overflow: 'hidden',
-              height: 'calc(100vh - 64px)',
+              height: '85vh',
               backgroundColor: (theme) =>
                 theme.palette.mode === 'light' ? '#fff' : '#121212',
               padding: 1,

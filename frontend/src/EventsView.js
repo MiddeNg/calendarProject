@@ -74,7 +74,7 @@ const EventsView = ({ user, selectedDate }) => {
           <Button onClick={() => setShowExportView(true)} variant="contained" color="primary" style={{ marginBottom: '10px' }}>
             Export Events
           </Button>
-          <div style={{ maxHeight: '70vh', overflowY: 'auto' , marginTop: '10px' }}>
+          <div style={{ maxHeight: '50vh', overflowY: 'auto' , marginTop: '10px' }}>
             <List ref={dateRef}>
               {error ? (
                 <Typography color="error">{error}</Typography>
