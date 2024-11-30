@@ -6,7 +6,7 @@ import {
   onAuthStateChanged, signOut, sendPasswordResetEmail
 } from "firebase/auth";
 import { GoogleAuthProvider } from "firebase/auth";
-import { TextField, Button, Typography, Alert, Link } from '@mui/material';
+import { TextField, Button, Typography, Alert } from '@mui/material';
 
 const provider = new GoogleAuthProvider();
 

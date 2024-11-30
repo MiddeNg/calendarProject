@@ -21,10 +21,12 @@ function CreateEventView({ handleAddEventClick, showEvents, selectedDate }) {
 
   useEffect(() => {
     if (selectedDate) {
-      setNewEvent({ ...newEvent, startDateTime: selectedDate });
+      setNewEvent((prevState) => ({
+        ...prevState,
+        startDateTime: selectedDate,
+      }));
     }
   }, [selectedDate]);
-
   const handleStartDateTimeChange = (value) => {
     setNewEvent({ ...newEvent, startDateTime: value });
   };
