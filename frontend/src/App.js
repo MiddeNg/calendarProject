@@ -46,7 +46,7 @@ const App = () => {
           </Grid>
           <Grid item xs={0} size={5} sx={{ display: { lg: 'block', md: 'block', xs: 'none' } }}>
             <Container sx={{ display: { lg: 'block', md: 'block', xs: 'none' }, maxWidth: 'sm' }}>
-              <EventsView user={user} selectedDate={date}  />
+              <EventsView user={user} selectedDate={date} toggleEventsView={() => setShowSidePanel(false)} />
             </Container>
           </Grid>
         </Grid>
@@ -67,7 +67,7 @@ const App = () => {
           open={showSidePanel}
           onClose={() => setShowSidePanel(false)}
         >
-          <EventsView user={user} selectedDate={date} />
+          <EventsView user={user} selectedDate={date} toggleEventsView={() => setShowSidePanel(false)}/>
         </Drawer>
       </div>
     </div>
