@@ -4,9 +4,11 @@ import CreateEventView from './CreateEventView';
 import Event from './Event';
 import backend from './firebaseBackend';
 import dayjs from 'dayjs';
+import { ImportAndExport } from './ExportCSV';
 
 const EventsView = ({ user, selectedDate }) => {
   const [showCreateEvent, setShowCreateEvent] = useState(false);
+  const [showExportView, setShowExportView] = useState(false);
   const [groupedEvents, setGroupedEvents] = useState({});
   const [error, setError] = useState('');
   const dateRef = React.createRef();
@@ -44,6 +46,7 @@ const EventsView = ({ user, selectedDate }) => {
       }
     }
   }, [selectedDate, dateRef]);
+
   const handleAddEventClick = async (event) => {
     await backend.createEvent(event);
     console.log("event", groupedEvents[event.startDateTime.format('YYYY-MM-DD')])
@@ -63,10 +66,13 @@ const EventsView = ({ user, selectedDate }) => {
           showEvents={() => setShowCreateEvent(false)}
           selectedDate={selectedDate}
         />
-      ) : (
+      ) : showExportView ? <ImportAndExport events={groupedEvents} setEvents={setGroupedEvents} toggleExportView={() => setShowExportView(false)} /> : (
         <>
           <Button onClick={() => setShowCreateEvent(true)} variant="contained" color="primary" style={{ marginBottom: '10px' }}>
             Add Event
+          </Button>
+          <Button onClick={() => setShowExportView(true)} variant="contained" color="primary" style={{ marginBottom: '10px' }}>
+            Export Events
           </Button>
           <div style={{ maxHeight: '600px', overflowY: 'auto', marginTop: '10px' }}>
             <List ref={dateRef}>
@@ -90,4 +96,3 @@ const EventsView = ({ user, selectedDate }) => {
 };
 
 export default EventsView;
-
