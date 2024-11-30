@@ -60,7 +60,7 @@ function CreateEventView({ handleAddEventClick, showEvents, selectedDate, editMo
 
   const handleAddClick = () => {
     if (!newEvent.name  || !newEvent.startDateTime || !newEvent.endDateTime) {
-      setErrorMessage('Please fill in all fields.');
+      setErrorMessage('Please fill in required fields.');
       return;
     }
     handleAddEventClick(newEvent);

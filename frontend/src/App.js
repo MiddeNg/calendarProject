@@ -10,16 +10,11 @@ import dayjs from 'dayjs';
 
 const App = () => {
   const [user, setUser] = useState(null);
-  const [date, setDate] = useState(dayjs());
+  const [date, setDate] = useState(null);
   const [showSidePanel, setShowSidePanel] = useState(false);
-
   useEffect(() => {
-    if (date) {
-      setShowSidePanel(true);
-    } else {
-      setShowSidePanel(false);
-    }
-  }, [date]);
+    setShowSidePanel(user && date);
+  }, [date, user]);
   const handleLogout = () => {
     logout();
   };
