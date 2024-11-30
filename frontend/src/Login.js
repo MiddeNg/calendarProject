@@ -3,7 +3,8 @@ import {
   getAuth, createUserWithEmailAndPassword,
   signInWithEmailAndPassword, signInWithPopup,
   setPersistence, browserLocalPersistence,
-  onAuthStateChanged, signOut, sendPasswordResetEmail
+  onAuthStateChanged, signOut, sendPasswordResetEmail,
+  signInWithRedirect
 } from "firebase/auth";
 import { GoogleAuthProvider } from "firebase/auth";
 import { TextField, Button, Typography, Alert } from '@mui/material';
@@ -30,6 +31,18 @@ const Login = ({ setUser }) => {
       await setPersistence(auth, browserLocalPersistence);
       await signInWithPopup(auth, provider);
     } catch (error) {
+      console.log(error.code)
+      console.log(error.message)
+      if (error.code === 'auth/popup-blocked') {
+        try {
+          await signInWithRedirect(auth, provider);
+          return
+        } catch (error) {
+          let defaultErrorMessage = 'Failed to login. Please try again.';
+          setLoginFailMessage(error.message ?? error.statusText ?? defaultErrorMessage);    
+          return
+        }
+      }
       let defaultErrorMessage = 'Failed to login. Please try again.';
       setLoginFailMessage(error.message ?? error.statusText ?? defaultErrorMessage);
     }
