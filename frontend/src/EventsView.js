@@ -7,8 +7,11 @@ import backend from './firebaseBackend';
 import dayjs from 'dayjs';
 import { ImportAndExport } from './ExportCSV';
 import Grid from '@mui/material/Grid2';
+
 const EventsView = ({ user, selectedDate, toggleEventsView }) => {
   const [showCreateEvent, setShowCreateEvent] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [eventToEdit, setEventToEdit] = useState(null);
   const [showExportView, setShowExportView] = useState(false);
   const [groupedEvents, setGroupedEvents] = useState({});
   const [error, setError] = useState('');
@@ -49,13 +52,38 @@ const EventsView = ({ user, selectedDate, toggleEventsView }) => {
   }, [selectedDate, dateRef]);
 
   const handleAddEventClick = async (event) => {
-    await backend.createEvent(event);
-    setGroupedEvents(prevState => ({ ...prevState, [event.startDateTime.format('YYYY-MM-DD')]: [...prevState[event.startDateTime.format('YYYY-MM-DD')] ?? [], event] }));
+    let eventId = await backend.createEvent(event);
+    event.id = eventId;
+    setGroupedEvents(prevState => ({
+      ...prevState,
+      [event.startDateTime.format('YYYY-MM-DD')]: [...prevState[event.startDateTime.format('YYYY-MM-DD')] ?? [], event]
+    }));
     setShowCreateEvent(false);
+    setEditMode(false);
+    setEventToEdit(null);
   };
+
   const onEditClick = (event) => {
-    
-  }
+    setEventToEdit(event);
+    setEditMode(true);
+    setShowCreateEvent(true);
+  };
+
+  const saveEditedEvent = async (event) => {
+    await backend.updateEvent(event);
+    setGroupedEvents(prevState => {
+      const newEvents = { ...prevState };
+      newEvents[event.startDateTime.format('YYYY-MM-DD')] = newEvents[event.startDateTime.format('YYYY-MM-DD')] ?? [];
+      const index = newEvents[event.startDateTime.format('YYYY-MM-DD')].findIndex(e => e.id === event.id);
+      if (index > -1) {
+        newEvents[event.startDateTime.format('YYYY-MM-DD')][index] = event;
+      }
+      return newEvents;
+    });
+    setShowCreateEvent(false);
+    setEditMode(false);
+    setEventToEdit(null);
+  };
   return (
     <Paper style={{
       borderRadius: '20px', padding: '20px',
@@ -65,8 +93,15 @@ const EventsView = ({ user, selectedDate, toggleEventsView }) => {
       {showCreateEvent ? (
         <CreateEventView
           handleAddEventClick={handleAddEventClick}
-          showEvents={() => setShowCreateEvent(false)}
+          showEvents={() => {
+            setShowCreateEvent(false);
+            setEditMode(false);
+            setEventToEdit(null);
+          }}
           selectedDate={selectedDate}
+          editModeBoolean={editMode}
+          originalEvent={eventToEdit}
+          saveEditedEvent={saveEditedEvent}
         />
       ) : showExportView ? <ImportAndExport events={groupedEvents} setEvents={setGroupedEvents} toggleExportView={() => setShowExportView(false)} /> : (
         <>

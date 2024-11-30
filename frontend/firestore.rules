@@ -4,6 +4,7 @@ service cloud.firestore {
     match /events/{eventId} {
       allow read: if request.auth != null && request.auth.uid == resource.data.uid;
       allow create: if request.resource.data.uid == request.auth.uid;
+      allow update: if request.resource.data.uid == request.auth.uid;
     }
 
     match /users/{userId} {

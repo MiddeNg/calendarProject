@@ -8,8 +8,8 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateTimePicker  } from '@mui/x-date-pickers/DateTimePicker';
 import { Alert, FormControlLabel, Switch } from '@mui/material';
 
-function CreateEventView({ handleAddEventClick, showEvents, selectedDate }) {
-  const [newEvent, setNewEvent] = useState({
+function CreateEventView({ handleAddEventClick, showEvents, selectedDate, editModeBoolean, originalEvent, saveEditedEvent }) {
+  const [newEvent, setNewEvent] = useState(editModeBoolean ? originalEvent : {
     name: '',
     description: '',
     startDateTime: selectedDate ? selectedDate.startOf('day') : null,
@@ -27,6 +27,13 @@ function CreateEventView({ handleAddEventClick, showEvents, selectedDate }) {
       }));
     }
   }, [selectedDate]);
+
+  useEffect(() => {
+    if (editModeBoolean) {
+      setNewEvent((originalEvent)); 
+    }
+  }, [editModeBoolean, originalEvent]);
+
   const handleStartDateTimeChange = (value) => {
     setNewEvent({ ...newEvent, startDateTime: value });
   };
@@ -113,7 +120,7 @@ function CreateEventView({ handleAddEventClick, showEvents, selectedDate }) {
         />
       </ListItem>
       <ListItem>
-        <Button variant="contained" onClick={handleAddClick}>Add Event</Button>
+        <Button variant="contained" onClick={editModeBoolean ? () => saveEditedEvent(newEvent) : handleAddClick} disabled={editModeBoolean && JSON.stringify(originalEvent) === JSON.stringify(newEvent)}>Save</Button>
         <Button variant="contained" onClick={showEvents}>Cancel</Button>
       </ListItem>
     </List>
