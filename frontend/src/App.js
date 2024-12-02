@@ -35,13 +35,12 @@ const App = () => {
       {!user && <Login setUser={setUser} />}
       <div className={`main-content ${user ? 'active' : 'inactive'}`}>
         <Grid container spacing={2}>
-          <Grid item xs={12} size={7}>
+          <Grid item xs={12} size={5.5}>
             <Calendar date={date} setDate={setDate} openSidePanel={() => setShowSidePanel(true)} />
           </Grid>
+          <Grid item xs={0} size={0.75} sx={{ display: { lg: 'block', md: 'block', xs: 'none' }}}></Grid>
           <Grid item xs={0} size={5} sx={{ display: { lg: 'block', md: 'block', xs: 'none' } }}>
-            <Container sx={{ display: { lg: 'block', md: 'block', xs: 'none' }, maxWidth: 'sm' }}>
               <EventsView user={user} selectedDate={date} toggleEventsView={() => setShowSidePanel(false)} />
-            </Container>
           </Grid>
         </Grid>
         <Drawer

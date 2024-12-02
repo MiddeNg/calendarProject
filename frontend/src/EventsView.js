@@ -87,7 +87,7 @@ const EventsView = ({ user, selectedDate, toggleEventsView }) => {
   return (
     <Paper style={{
       borderRadius: '20px', padding: '20px',
-      margin: '10px', width: '100%', maxWidth: '600px',
+      margin: '5px', width: '100%', 
       height: '80vh',
     }}>
       {showCreateEvent ? (
