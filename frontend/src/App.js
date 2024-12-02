@@ -4,7 +4,7 @@ import {Login, logout } from './Login';
 import Calendar from './Calendar';
 import Drawer from '@mui/material/Drawer';
 import EventsView from './EventsView';
-import { Container, AppBar, Toolbar, Typography, Button } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
 const App = () => {
