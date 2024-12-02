@@ -1,4 +1,4 @@
-import { collection, addDoc, getDocs, query, where, orderBy, updateDoc, doc } from "firebase/firestore";
+import { collection, addDoc, getDocs, query, where, orderBy, updateDoc, doc, writeBatch } from "firebase/firestore";
 import { db } from './firebase';
 import { getAuth } from "firebase/auth";
 import { dayJSToFirestoreTS, firestoreTSToDayJS } from "./utils";
@@ -45,7 +45,33 @@ const firebaseBackend = {
     await updateDoc(docRef, event);
     return docRef.id;
   },
-
+  updateBatchEvents: async (newEvents, UpdatedEvents) => {
+    let batch = writeBatch(db);
+    console.log("newEvents", newEvents)
+    console.log("UpdatedEvents", UpdatedEvents)
+    newEvents.forEach(event => {
+      const docRef = doc(db, "events");
+      batch.set(docRef, {
+        uid: event.uid,
+        name: event.name,
+        description: event.description,
+        startDateTime: dayJSToFirestoreTS(event.startDateTime), 
+        endDateTime: dayJSToFirestoreTS(event.endDateTime),
+        isFullDay: event.isFullDay,
+      });
+    })
+    UpdatedEvents.forEach(event => {
+      const docRef = doc(db, "events", event.id);
+      batch.update(docRef, {
+        name: event.name,
+        description: event.description,
+        startDateTime: dayJSToFirestoreTS(event.startDateTime), 
+        endDateTime: dayJSToFirestoreTS(event.endDateTime),
+        isFullDay: event.isFullDay,
+      });
+    });
+    await batch.commit();
+  },
   getAllEvents: async () => {
     const user = getAuth().currentUser
     const eventsRef = collection(db, "events");

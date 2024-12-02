@@ -17,23 +17,25 @@ const EventsView = ({ user, selectedDate, toggleEventsView }) => {
   const [error, setError] = useState('');
   const dateRef = React.createRef();
 
+  const fetchEvents = async () => {
+    try {
+      const events = await backend.getAllEvents();
+      const groupedEvents = events.reduce((acc, event) => {
+        const startDate = event.startDateTime.format('YYYY-MM-DD');
+        if (!acc[startDate]) {
+          acc[startDate] = [];
+        }
+        acc[startDate].push(event);
+        return acc;
+      }, {});
+      setGroupedEvents(groupedEvents);
+      console.log(groupedEvents)
+    } catch (error) {
+      setError(error.message ?? error.statusText ?? 'Failed to fetch events. Please try again.');
+    }
+  };
+
   useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const events = await backend.getAllEvents();
-        const groupedEvents = events.reduce((acc, event) => {
-          const startDate = event.startDateTime.format('YYYY-MM-DD');
-          if (!acc[startDate]) {
-            acc[startDate] = [];
-          }
-          acc[startDate].push(event);
-          return acc;
-        }, {});
-        setGroupedEvents(groupedEvents);
-      } catch (error) {
-        setError(error.message ?? error.statusText ?? 'Failed to fetch events. Please try again.');
-      }
-    };
     user && fetchEvents();
   }, [user]);
 
@@ -50,6 +52,11 @@ const EventsView = ({ user, selectedDate, toggleEventsView }) => {
       }
     }
   }, [selectedDate, dateRef]);
+
+  const refetchEvents = async () => {
+    await fetchEvents();
+    setShowExportView(false);
+  };
 
   const handleAddEventClick = async (event) => {
     let eventId = await backend.createEvent(event);
@@ -105,7 +112,7 @@ const EventsView = ({ user, selectedDate, toggleEventsView }) => {
           originalEvent={eventToEdit}
           saveEditedEvent={saveEditedEvent}
         />
-      ) : showExportView ? <ImportAndExport events={groupedEvents} setEvents={setGroupedEvents} toggleExportView={() => setShowExportView(false)} /> : (
+      ) : showExportView ? <ImportAndExport events={groupedEvents} refetchEvents={refetchEvents} toggleExportView={() => setShowExportView(false)} /> : (
         <>
           <Grid container spacing={1} style={{ marginBottom: '10px' }}>
             <Grid item size={5}>
