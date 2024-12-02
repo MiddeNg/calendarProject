@@ -86,15 +86,6 @@ function CreateEventView({ handleAddEventClick, showEvents, selectedDate, editMo
         />
       </ListItem>
       <ListItem>
-        <TextField
-          label="Description"
-          multiline
-          rows={4}
-          value={newEvent.description}
-          onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
-        />
-      </ListItem>
-      <ListItem>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DateTimePicker 
             renderInput={(props) => <TextField {...props} required />}
@@ -122,7 +113,17 @@ function CreateEventView({ handleAddEventClick, showEvents, selectedDate, editMo
         />
       </ListItem>
       <ListItem>
-        <Button variant="contained" onClick={editModeBoolean ? () => saveEditedEvent(newEvent) : handleAddClick} disabled={editModeBoolean && JSON.stringify(originalEvent) === JSON.stringify(newEvent)}>Save</Button>
+        <TextField
+          label="Description"
+          multiline
+          rows={4}
+          style={{ overflow: 'auto', width: '80vw' }}
+          value={newEvent.description}
+          onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
+        />
+      </ListItem>
+      <ListItem>
+        <Button variant="contained" onClick={editModeBoolean ? () => saveEditedEvent(newEvent) : handleAddClick} disabled={editModeBoolean && JSON.stringify(originalEvent) === JSON.stringify(newEvent)} style={{ marginRight: '10px' }}>Save</Button>
         <Button variant="contained" onClick={showEvents}>Cancel</Button>
       </ListItem>
     </List>
