@@ -15,7 +15,7 @@ function Event({event, onEditClick}){
         },
         display: { xs: 'block', md: 'flex' },
         width: "95%",
-        marginLeft: "1%",
+        marginLeft: {lg:"1%", md:"0%", sm:"0%", xs:"0%"},
       }}
       style={{ marginBottom: '10px', cursor: 'pointer' }}
       onClick={() => onEditClick(event)}

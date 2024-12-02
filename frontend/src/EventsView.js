@@ -85,11 +85,13 @@ const EventsView = ({ user, selectedDate, toggleEventsView }) => {
     setEventToEdit(null);
   };
   return (
-    <Paper style={{
-      borderRadius: '20px', padding: '20px',
-      margin: '5px', width: '100%', 
-      height: '80vh',
-    }}>
+    <Paper
+      style={{
+        width: '95%',
+        borderRadius: '3%', paddingLeft: '3%', paddingTop: '3%',
+        height: '80vh',
+      }}
+      sx={{ margin: { lg: '3%' } }}>
       {showCreateEvent ? (
         <CreateEventView
           handleAddEventClick={handleAddEventClick}
