@@ -107,7 +107,9 @@ const EventsView = ({ user, selectedDate, toggleEventsView }) => {
         <>
           <Grid container spacing={1} style={{ marginBottom: '10px' }}>
             <Grid item size={5}>
-              <Button onClick={toggleEventsView} variant="contained" color="primary">
+              <Button onClick={toggleEventsView} variant="contained" color="primary"
+                sx={{ display: { md: 'none', lg: 'none' } }}
+              >
                 <ArrowBack />
               </Button>
             </Grid>

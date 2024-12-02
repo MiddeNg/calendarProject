@@ -88,6 +88,8 @@ function CreateEventView({ handleAddEventClick, showEvents, selectedDate, editMo
       <ListItem>
         <TextField
           label="Description"
+          multiline
+          rows={4}
           value={newEvent.description}
           onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
         />
