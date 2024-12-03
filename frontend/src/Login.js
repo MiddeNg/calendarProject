@@ -32,6 +32,7 @@ const Login = ({ setUser }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showRegister, setShowRegister] = useState(false);
+  const [showForgetPassword, setShowForgetPassword] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -97,7 +98,10 @@ const Login = ({ setUser }) => {
     }
   };
 
-  const handleForgetPassword = async () => {
+  const handleForgetPasswordClick = async () => {
+    setShowForgetPassword(true);
+  }
+  const handleSendPasswordResetEmail = async () => {
     if (!email) {
       setLoginFailMessage('Please enter your email address.');
     } else {
@@ -108,18 +112,47 @@ const Login = ({ setUser }) => {
         setLoginFailMessage(error.message);
       }
     }
+    setShowForgetPassword(false);
   }
 
   const handleToggleRegister = () => {
     setShowRegister(!showRegister);
   }
-
+  function ForgetPassword() {
+    return (
+      <div className="mt-3">
+        <Typography variant="h5" gutterBottom>Forgot Password</Typography>
+        <Typography variant="body1" gutterBottom>
+          Enter your email address to receive a password reset email.
+        </Typography>
+        <TextField
+          label="Email address"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          fullWidth
+          margin="normal"
+        />
+        <Button onClick={handleSendPasswordResetEmail} color="primary" variant='contained'
+          sx={{ justifyContent: 'center', display: 'block', margin: 'auto' }}
+        >
+          Send reset email
+        </Button>
+        <Button onClick={() => setShowForgetPassword(false)} color="primary" variant='contained'
+          sx={{ justifyContent: 'center', display: 'block', margin: 'auto', marginTop: '10px' }}
+        >
+          Back
+        </Button>
+      </div>
+    )
+  }
   return showRegister ? (
     <Register setUser={setUser} setShowRegister={setShowRegister} />
   ) : (
     <div className="login-overlay">
       <div className="login-container card p-4">
-        {loading ? (
+        {showForgetPassword? <ForgetPassword /> : loading ? (
           <Loading />
         ) : (
           <>
@@ -157,7 +190,7 @@ const Login = ({ setUser }) => {
             >
               Login with Google
             </Button>
-            <Button onClick={handleForgetPassword} variant="secondary">
+            <Button onClick={handleForgetPasswordClick} variant="secondary">
               Forgot Password?
             </Button>
             <Button onClick={handleToggleRegister} variant="secondary">
