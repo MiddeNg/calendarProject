@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   getAuth, createUserWithEmailAndPassword,
-  signInWithEmailAndPassword, signInWithPopup,
+  signInWithEmailAndPassword,
   setPersistence, browserLocalPersistence,
   onAuthStateChanged, signOut, sendPasswordResetEmail,
   signInWithRedirect,
