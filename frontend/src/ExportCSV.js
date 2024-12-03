@@ -47,7 +47,8 @@ export const ImportAndExport = ({ events, refetchEvents, toggleExportView }) => 
       setErrorMessage('No file selected');
       return;
     };
-    if (e.target.files[0].type !== 'text/csv') {
+    if (!e.target.files[0].name.endsWith('.csv')) {
+      console.log(e.target.files[0].name)
       setErrorMessage('Invalid file type. Please select a CSV file.');
       return;
     }

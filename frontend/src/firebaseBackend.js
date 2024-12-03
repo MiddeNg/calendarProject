@@ -2,6 +2,7 @@ import { collection, addDoc, getDocs, query, where, orderBy, updateDoc, doc, wri
 import { db } from './firebase';
 import { getAuth } from "firebase/auth";
 import { dayJSToFirestoreTS, firestoreTSToDayJS } from "./utils";
+import { v4 as uuid } from 'uuid';
 
 const firebaseBackend = {
   createEvent: async (inputEvent) => {
@@ -46,19 +47,22 @@ const firebaseBackend = {
     return docRef.id;
   },
   updateBatchEvents: async (newEvents, UpdatedEvents) => {
+    const userId = getAuth().currentUser.uid
     let batch = writeBatch(db);
     console.log("newEvents", newEvents)
     console.log("UpdatedEvents", UpdatedEvents)
     newEvents.forEach(event => {
-      const docRef = doc(db, "events");
-      batch.set(docRef, {
-        uid: event.uid,
+      const docRef = doc(db, "events", uuid());
+      const newEvent = {
+        uid: userId,
         name: event.name,
         description: event.description,
         startDateTime: dayJSToFirestoreTS(event.startDateTime), 
         endDateTime: dayJSToFirestoreTS(event.endDateTime),
         isFullDay: event.isFullDay,
-      });
+      }
+      console.log("newEvent", newEvent)
+      batch.set(docRef, newEvent);
     })
     UpdatedEvents.forEach(event => {
       const docRef = doc(db, "events", event.id);
