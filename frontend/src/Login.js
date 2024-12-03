@@ -19,6 +19,17 @@ const Login = ({ setUser }) => {
   const [password, setPassword] = useState('');
   const [showRegister, setShowRegister] = useState(false);
 
+  // for google login redirect
+  getRedirectResult(auth)
+    .then((result) => {
+      if (result.user) {
+        setUser(result.user);
+      }
+    }).catch((error) => {
+      console.log(error) 
+      setLoginFailMessage(error.message ?? error.statusText ?? 'Failed to login with google. Please try again.');
+    });
+
   onAuthStateChanged(auth, (user) => {
     if (user) {
       setUser(user);
@@ -40,10 +51,6 @@ const Login = ({ setUser }) => {
       if (error.code === 'auth/popup-blocked') {
         try {
           await signInWithRedirect(auth, provider);
-          const result = await getRedirectResult(auth);
-          setLoginFailMessage('there is result')
-          setUser(result.user)
-          return
         } catch (error) {
           let defaultErrorMessage = 'Failed to login. Please try again.';
           setLoginFailMessage(error.message ?? error.statusText ?? defaultErrorMessage);    
