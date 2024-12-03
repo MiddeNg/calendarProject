@@ -4,7 +4,8 @@ import {
   signInWithEmailAndPassword, signInWithPopup,
   setPersistence, browserLocalPersistence,
   onAuthStateChanged, signOut, sendPasswordResetEmail,
-  signInWithRedirect
+  signInWithRedirect,
+  getRedirectResult
 } from "firebase/auth";
 import { GoogleAuthProvider } from "firebase/auth";
 import { TextField, Button, Typography, Alert } from '@mui/material';
@@ -31,7 +32,6 @@ const Login = ({ setUser }) => {
       provider.setCustomParameters({
         prompt: 'select_account'
      });
-     
       await setPersistence(auth, browserLocalPersistence);
       await signInWithPopup(auth, provider);
     } catch (error) {
@@ -40,6 +40,9 @@ const Login = ({ setUser }) => {
       if (error.code === 'auth/popup-blocked') {
         try {
           await signInWithRedirect(auth, provider);
+          const result = await getRedirectResult(auth);
+          setLoginFailMessage('there is result')
+          setUser(result.user)
           return
         } catch (error) {
           let defaultErrorMessage = 'Failed to login. Please try again.';
