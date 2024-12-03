@@ -22,7 +22,8 @@ const Login = ({ setUser }) => {
   // for google login redirect
   getRedirectResult(auth)
     .then((result) => {
-      if (result.user) {
+      console.log(result)
+      if (result && result.user) {
         setUser(result.user);
       }
     }).catch((error) => {
@@ -44,7 +45,7 @@ const Login = ({ setUser }) => {
         prompt: 'select_account'
      });
       await setPersistence(auth, browserLocalPersistence);
-      await signInWithPopup(auth, provider);
+      await signInWithRedirect(auth, provider);
     } catch (error) {
       console.log(error.code)
       console.log(error.message)

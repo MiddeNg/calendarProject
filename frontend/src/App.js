@@ -6,12 +6,27 @@ import Drawer from '@mui/material/Drawer';
 import EventsView from './EventsView';
 import { AppBar, Toolbar, Typography, Button } from '@mui/material';
 import Grid from '@mui/material/Grid2';
-
+import { getRedirectResult } from 'firebase/auth';
+import { getAuth } from 'firebase/auth';
 const App = () => {
   const [user, setUser] = useState(null);
   const [date, setDate] = useState(null);
   const [showSidePanel, setShowSidePanel] = useState(false);
-  useEffect(() => {
+  React.useEffect(() => {
+    const debugRedirectResult = async () => {
+      try {
+        const result = await getRedirectResult(getAuth());
+        console.log(result)
+        if (result && result.user) {
+          setUser(result.user);
+        }
+      } catch (error) {
+        console.log(error) // Debug errors from redirect response
+      }
+    }
+    debugRedirectResult()
+  }, [])
+    useEffect(() => {
     setShowSidePanel(user && date);
   }, [date, user]);
   const handleLogout = () => {
