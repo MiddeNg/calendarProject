@@ -28,6 +28,10 @@ const Login = ({ setUser }) => {
 
   const handleGoogleLogin = async () => {
     try {
+      provider.setCustomParameters({
+        prompt: 'select_account'
+     });
+     
       await setPersistence(auth, browserLocalPersistence);
       await signInWithPopup(auth, provider);
     } catch (error) {
@@ -194,7 +198,7 @@ const Register = ({setShowRegister}) => {
   );
 };
 
-const logout = () => {
+const logout = async () => {
   signOut(auth);
 }
 export { Login, logout };
