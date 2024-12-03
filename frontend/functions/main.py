@@ -1,4 +1,6 @@
-from firebase_admin import credentials, firestore, initialize_app, auth
+import os
+from firebase_admin import firestore, initialize_app, auth
+from firebase_admin import datetime as firebase_datetime
 from firebase_functions import scheduler_fn
 import datetime
 import smtplib
@@ -25,30 +27,36 @@ def send_email(sender_email, sender_password, receiver_email, subject, message):
     del msg
     server.quit()
 
-@scheduler_fn.on_schedule(schedule='every 1 hours')
+@scheduler_fn.on_schedule(schedule='every 1 hours', secrets=["EMAIL_PASSWORD"])
 def send_reminder_email(event: scheduler_fn.ScheduledEvent):
+    EMAIL_PASSWORD = os.environ.get('EMAIL_PASSWORD')
+    if EMAIL_PASSWORD is None:
+        raise Exception('EMAIL_PASSWORD environment variable is not set')
+
     db = firestore.client()
 
     start = datetime.datetime.now() +datetime.timedelta(hours=1)
     end = start + datetime.timedelta(hours=1)
-
+    print("start", start)
+    print("end", end)
     events_ref = db.collection('events')
-    query = events_ref.where('startTime', '<', end).stream()
+    query = events_ref.where('startDateTime', '>=', start).where('startDateTime', '<', end).stream()
     count = 0
     for event in query:
         count += 1
         event_data = event.to_dict()
         event_name = event_data.get('name')
         user_id = event_data.get('uid')
-
         user = auth.get_user(user_id)
         user_email = user.email
-        print(user_email)
-        sender_email = 'your_email@gmail.com'  # Update with your sender email
-        sender_password = 'your_email_password'  # Update with your sender email password
+        print("event", event)
+        sender_email = 'williamcalendarproject@gmail.com'  # Update with your sender email
+        sender_password = EMAIL_PASSWORD  # Update with your sender email password
         subject = 'Event Reminder'
-        message = f'Don\'t forget about the event: {event_name}!'
-        # send_email(sender_email, sender_password, user_email, subject, message)
+        print(type(event_data.get("startDateTime")))
+        print(event_data.get("startDateTime"))
+
+        message = f"Don\'t forget about the event: {event_name} starting at {event_data.get('startDateTime').strftime('%Y-%m-%d %H:%M:%S %Z')}!"
+        send_email(sender_email, sender_password, user_email, subject, message)
 
     print(f"{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {count} Reminder email sent")
-
