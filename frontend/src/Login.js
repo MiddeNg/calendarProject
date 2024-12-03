@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   getAuth, createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -9,7 +9,21 @@ import {
 } from "firebase/auth";
 import { GoogleAuthProvider } from "firebase/auth";
 import { TextField, Button, Typography, Alert } from '@mui/material';
+import { tailspin } from 'ldrs'
 
+tailspin.register()
+
+const Loading = () => {
+  return (
+    <l-tailspin
+      size="40"
+      stroke="5"
+      speed="0.9"
+      color="black"
+    ></l-tailspin>
+  )
+
+}
 const provider = new GoogleAuthProvider();
 
 const auth = getAuth();
@@ -18,6 +32,14 @@ const Login = ({ setUser }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showRegister, setShowRegister] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   // for google login redirect
   getRedirectResult(auth)
@@ -27,7 +49,7 @@ const Login = ({ setUser }) => {
         setUser(result.user);
       }
     }).catch((error) => {
-      console.log(error) 
+      console.log(error)
       setLoginFailMessage(error.message ?? error.statusText ?? 'Failed to login with google. Please try again.');
     });
 
@@ -43,7 +65,7 @@ const Login = ({ setUser }) => {
     try {
       provider.setCustomParameters({
         prompt: 'select_account'
-     });
+      });
       await setPersistence(auth, browserLocalPersistence);
       await signInWithRedirect(auth, provider);
     } catch (error) {
@@ -54,7 +76,7 @@ const Login = ({ setUser }) => {
           await signInWithRedirect(auth, provider);
         } catch (error) {
           let defaultErrorMessage = 'Failed to login. Please try again.';
-          setLoginFailMessage(error.message ?? error.statusText ?? defaultErrorMessage);    
+          setLoginFailMessage(error.message ?? error.statusText ?? defaultErrorMessage);
           return
         }
       }
@@ -97,51 +119,57 @@ const Login = ({ setUser }) => {
   ) : (
     <div className="login-overlay">
       <div className="login-container card p-4">
-        <Typography variant="h4" gutterBottom>Login</Typography>
-        {loginFailMessage && (
-          <Alert severity="error" className="mt-3">{loginFailMessage}</Alert>
-        )}
-        <form onSubmit={handleEmailLogin}>
-          <TextField
-            label="Email address"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            fullWidth
-            margin="normal"
-          />
-          <Button type="submit" variant="contained" color="primary" fullWidth>
-            Login with Email/Password
-          </Button>
-        </form>
+        {loading ? (
+          <Loading />
+        ) : (
+          <>
+            <Typography variant="h4" gutterBottom>Login</Typography>
+            {loginFailMessage && (
+              <Alert severity="error" className="mt-3">{loginFailMessage}</Alert>
+            )}
+            <form onSubmit={handleEmailLogin}>
+              <TextField
+                label="Email address"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                fullWidth
+                margin="normal"
+              />
+              <TextField
+                label="Password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                fullWidth
+                margin="normal"
+              />
+              <Button type="submit" variant="contained" color="primary" fullWidth>
+                Login with Email/Password
+              </Button>
+            </form>
 
-        <Button
-          onClick={handleGoogleLogin}
-          variant="secondary"
-        >
-          Login with Google
-        </Button>
-        <Button onClick={handleForgetPassword} variant="secondary">
-          Forgot Password?
-        </Button>
-        <Button onClick={handleToggleRegister} variant="secondary">
-          Register
-        </Button>
+            <Button
+              onClick={handleGoogleLogin}
+              variant="secondary"
+            >
+              Login with Google
+            </Button>
+            <Button onClick={handleForgetPassword} variant="secondary">
+              Forgot Password?
+            </Button>
+            <Button onClick={handleToggleRegister} variant="secondary">
+              Register
+            </Button>
+          </>
+        )}
       </div>
     </div>
   );
 }
-const Register = ({setShowRegister}) => {
+const Register = ({ setShowRegister }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -167,7 +195,7 @@ const Register = ({setShowRegister}) => {
       <div className="login-container card p-4">
         <Typography variant="h4" gutterBottom>Register</Typography>
         {registerFailMessage && (
-            <Alert severity="error" className="mt-3">{registerFailMessage}</Alert>
+          <Alert severity="error" className="mt-3">{registerFailMessage}</Alert>
         )}
         <form onSubmit={handleCreateAccount}>
           <TextField
