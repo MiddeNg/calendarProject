@@ -76,6 +76,24 @@ const EventsView = ({ user, selectedDate, toggleEventsView }) => {
     setShowCreateEvent(true);
   };
 
+  const onDeleteClick = async (event) => {
+    try {
+      await backend.deleteEvent(event.id);
+    } catch (error) {
+      setError(error.message ?? error.statusText ?? 'Failed to delete event. Please try again.');
+    }
+    setGroupedEvents(prevState => {
+      const newEvents = { ...prevState };
+      const index = newEvents[event.startDateTime.format('YYYY-MM-DD')].findIndex(e => e.id === event.id);
+      if (index > -1) {
+        newEvents[event.startDateTime.format('YYYY-MM-DD')].splice(index, 1);
+        if (newEvents[event.startDateTime.format('YYYY-MM-DD')].length === 0) {
+          delete newEvents[event.startDateTime.format('YYYY-MM-DD')];
+        }
+      }
+      return newEvents;
+    });
+  }
   const saveEditedEvent = async (event) => {
     await backend.updateEvent(event);
     setGroupedEvents(prevState => {
@@ -138,11 +156,14 @@ const EventsView = ({ user, selectedDate, toggleEventsView }) => {
               {error ? (
                 <Typography color="error">{error}</Typography>
               ) : (
+                Object.keys(groupedEvents).length === 0 ? (
+                  <Typography variant="h6" align="center">Click the '+' button to add an event!</Typography>
+                ) :
                 Object.entries(groupedEvents).sort((a, b) => new Date(a[0]) - new Date(b[0])).map(([date, events]) => (
                   <div key={date} data-key={date} className='dateCard'>
                     <Typography variant="h6">{date} </Typography>
                     {events.map((event, index) => (
-                      <Event key={index} event={event} onEditClick={onEditClick} />
+                      <Event key={index} event={event} onEditClick={onEditClick} onDeleteClick={() =>onDeleteClick(event) } />
                     ))}
                   </div>
                 )))}

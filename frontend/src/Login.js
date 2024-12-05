@@ -101,9 +101,10 @@ const Login = ({ setUser }) => {
   const handleForgetPasswordClick = async () => {
     setShowForgetPassword(true);
   }
-  const handleSendPasswordResetEmail = async () => {
+  const handleSendPasswordResetEmail = async (email) => {
     if (!email) {
       setLoginFailMessage('Please enter your email address.');
+      return
     } else {
       try {
         await sendPasswordResetEmail(auth, email);
@@ -119,12 +120,15 @@ const Login = ({ setUser }) => {
     setShowRegister(!showRegister);
   }
   function ForgetPassword() {
+    const [email, setEmail] = useState('');
+
     return (
       <div className="mt-3">
         <Typography variant="h5" gutterBottom>Forgot Password</Typography>
         <Typography variant="body1" gutterBottom>
           Enter your email address to receive a password reset email.
         </Typography>
+        {loginFailMessage && <Alert severity="error" className="mt-3">{loginFailMessage}</Alert>}
         <TextField
           label="Email address"
           type="email"
@@ -134,7 +138,7 @@ const Login = ({ setUser }) => {
           fullWidth
           margin="normal"
         />
-        <Button onClick={handleSendPasswordResetEmail} color="primary" variant='contained'
+        <Button onClick={() => handleSendPasswordResetEmail(email)} color="primary" variant='contained'
           sx={{ justifyContent: 'center', display: 'block', margin: 'auto' }}
         >
           Send reset email
@@ -152,7 +156,7 @@ const Login = ({ setUser }) => {
   ) : (
     <div className="login-overlay">
       <div className="login-container card p-4">
-        {showForgetPassword? <ForgetPassword /> : loading ? (
+        {showForgetPassword? <ForgetPassword email={email} setEmail={setEmail}/> : loading ? (
           <Loading />
         ) : (
           <>

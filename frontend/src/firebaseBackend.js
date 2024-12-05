@@ -1,4 +1,4 @@
-import { collection, addDoc, getDocs, query, where, orderBy, updateDoc, doc, writeBatch } from "firebase/firestore";
+import { collection, addDoc, getDocs, query, where, orderBy, updateDoc, doc, writeBatch, deleteDoc } from "firebase/firestore";
 import { db } from './firebase';
 import { getAuth } from "firebase/auth";
 import { dayJSToFirestoreTS, firestoreTSToDayJS } from "./utils";
@@ -91,6 +91,9 @@ const firebaseBackend = {
     });
     return events;
   },
+  deleteEvent: async (event_id) => {
+    return deleteDoc(doc(db, "events", event_id)); 
+  }
 };
 
 export default firebaseBackend

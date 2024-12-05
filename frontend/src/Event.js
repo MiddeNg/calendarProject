@@ -1,6 +1,6 @@
 import { Card, CardContent, Typography, Button } from "@mui/material"
 
-function Event({event, onEditClick}){
+function Event({event, onEditClick, onDeleteClick}) {
   const {name, description, startDateTime, endDateTime} = event
   return(
     <Card
@@ -18,7 +18,7 @@ function Event({event, onEditClick}){
         marginLeft: {lg:"1%", md:"0%", sm:"0%", xs:"0%"},
       }}
       style={{ marginBottom: '10px', cursor: 'pointer' }}
-      onClick={() => onEditClick(event)}
+      // onClick={() => onEditClick(event)}
     >
       <CardContent>
         <Typography variant="h5" component="h2">
@@ -30,8 +30,11 @@ function Event({event, onEditClick}){
         <Typography variant="body2" color="textSecondary" component="p">
           {startDateTime.format('YYYY/MM/DD, h:mm a')} - {endDateTime.format('YYYY/MM/DD, h:mm a')}
         </Typography>
-        {<Button sx={{display: { xs: 'none', md: 'block' }}} size="small" variant="contained" color="primary">
+        {<Button sx={{display: { xs: 'inline-block', md: 'inline-block' }, marginRight: '10px'}} size="small" variant="contained" color="primary" onClick={() => onEditClick(event)}>
           Edit
+        </Button>}
+        {<Button size="small" variant="contained" color="secondary" onClick={() => onDeleteClick(event)}>
+          Delete
         </Button>}
       </CardContent>
     </Card>
