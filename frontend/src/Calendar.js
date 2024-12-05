@@ -16,15 +16,14 @@ function CustomActionBar(props) {
   );
 }
 
-function Calendar({ date, setDate, openSidePanel }) {
+function Calendar({ date, onCalendarClick, openSidePanel }) {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <div>
         <StaticDatePicker
           value={date}
           onChange={(date) => {
-            console.log("date", date)
-            setDate(date)
+            onCalendarClick(date)
           }}
           slots={{
             actionBar: CustomActionBar,

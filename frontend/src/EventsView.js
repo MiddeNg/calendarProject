@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { List, Button, Typography, Paper } from '@mui/material';
 import { Add, ArrowBack, FileUpload } from '@mui/icons-material';
 import CreateEventView from './CreateEventView';
@@ -8,14 +8,34 @@ import dayjs from 'dayjs';
 import { ImportAndExport } from './ExportCSV';
 import Grid from '@mui/material/Grid2';
 
-const EventsView = ({ user, selectedDate, toggleEventsView }) => {
+const EventsView = ({ logined, selectedDate, toggleEventsView }, ref) => {
   const [showCreateEvent, setShowCreateEvent] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [eventToEdit, setEventToEdit] = useState(null);
   const [showExportView, setShowExportView] = useState(false);
   const [groupedEvents, setGroupedEvents] = useState({});
   const [error, setError] = useState('');
-  const dateRef = React.createRef();
+  const dateRef = React.useRef();
+
+
+  useImperativeHandle(ref, () => {
+    return {
+      scrollToListItem (date) {
+        console.log(dateRef.current)
+        if (date && dateRef.current) {
+          const divs = dateRef.current.querySelectorAll('div.dateCard');
+          const dateStart = date.startOf('day');
+          const divToShow = Object.values(divs).find((div) => {
+            const key = div.getAttribute('data-key');
+            return dayjs(key).isSame(dateStart) || dayjs(key).isAfter(dateStart);
+          }) ?? (divs.length > 0 ? divs[divs.length - 1] : null);
+          if (divToShow) {
+            divToShow.scrollIntoView({ behavior: 'smooth' });
+          }
+        }
+    }
+  }
+  });
 
   const fetchEvents = async () => {
     try {
@@ -36,31 +56,40 @@ const EventsView = ({ user, selectedDate, toggleEventsView }) => {
   };
 
   useEffect(() => {
-    user && fetchEvents();
-  }, [user]);
+    logined && fetchEvents();
+  }, [logined]);
 
-  useEffect(() => {
-    if (selectedDate && dateRef.current) {
-      const divs = dateRef.current.querySelectorAll('div.dateCard');
-      const selectedDateStart = selectedDate.startOf('day');
-      const divToShow = Object.values(divs).find((div) => {
-        const key = div.getAttribute('data-key');
-        return dayjs(key).isSame(selectedDateStart) || dayjs(key).isAfter(selectedDateStart);
-      }) ?? (divs.length > 0 ? divs[divs.length - 1] : null);
-      if (divToShow) {
-        divToShow.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
-  }, [selectedDate, dateRef]);
+  // useEffect(() => {
+  //   if (selectedDate && dateRef.current) {
+  //     const divs = dateRef.current.querySelectorAll('div.dateCard');
+  //     const selectedDateStart = selectedDate.startOf('day');
+  //     const divToShow = Object.values(divs).find((div) => {
+  //       const key = div.getAttribute('data-key');
+  //       return dayjs(key).isSame(selectedDateStart) || dayjs(key).isAfter(selectedDateStart);
+  //     }) ?? (divs.length > 0 ? divs[divs.length - 1] : null);
+  //     if (divToShow) {
+  //       divToShow.scrollIntoView({ behavior: 'smooth' });
+  //     }
+  //   }
+  // }, [selectedDate, dateRef]);
 
   const refetchEvents = async () => {
-    await fetchEvents();
+    try {
+      await fetchEvents();
+    } catch (error) {
+      setError(error.message ?? error.statusText ?? 'Failed to fetch events. Please try again.');
+    }
     setShowExportView(false);
   };
 
   const handleAddEventClick = async (event) => {
-    let eventId = await backend.createEvent(event);
-    event.id = eventId;
+    try {
+      let eventId = await backend.createEvent(event);
+      event.id = eventId;
+    } catch (error) {
+      setError(error.message ?? error.statusText ?? 'Failed to create event. Please try again.');
+      return
+    }
     setGroupedEvents(prevState => ({
       ...prevState,
       [event.startDateTime.format('YYYY-MM-DD')]: [...prevState[event.startDateTime.format('YYYY-MM-DD')] ?? [], event]
@@ -81,6 +110,7 @@ const EventsView = ({ user, selectedDate, toggleEventsView }) => {
       await backend.deleteEvent(event.id);
     } catch (error) {
       setError(error.message ?? error.statusText ?? 'Failed to delete event. Please try again.');
+      return
     }
     setGroupedEvents(prevState => {
       const newEvents = { ...prevState };
@@ -95,7 +125,12 @@ const EventsView = ({ user, selectedDate, toggleEventsView }) => {
     });
   }
   const saveEditedEvent = async (event) => {
-    await backend.updateEvent(event);
+    try {
+      await backend.updateEvent(event);
+    } catch (error) {
+      setError(error.message ?? error.statusText ?? 'Failed to update event. Please try again.');
+      return
+    }
     setGroupedEvents(prevState => {
       const newEvents = { ...prevState };
       newEvents[event.startDateTime.format('YYYY-MM-DD')] = newEvents[event.startDateTime.format('YYYY-MM-DD')] ?? [];
@@ -130,22 +165,22 @@ const EventsView = ({ user, selectedDate, toggleEventsView }) => {
           originalEvent={eventToEdit}
           saveEditedEvent={saveEditedEvent}
         />
-      ) : showExportView ? <ImportAndExport events={groupedEvents} refetchEvents={refetchEvents} toggleExportView={() => setShowExportView(false)} /> : (
-        <>
+      ) : showExportView ? <ImportAndExport events={groupedEvents} refetchEvents={refetchEvents} toggleExportView={() => setShowExportView(false)} /> : null} 
+        <div style={{ display: showCreateEvent || showExportView ? 'none' : 'block' }}>
           <Grid container spacing={1} style={{ marginBottom: '10px' }}>
-            <Grid item size={5}>
+            <Grid size={5}>
               <Button onClick={toggleEventsView} variant="contained" color="primary"
                 sx={{ display: { md: 'none', lg: 'none' } }}
               >
                 <ArrowBack />
               </Button>
             </Grid>
-            <Grid item>
+            <Grid>
               <Button onClick={() => setShowCreateEvent(true)} variant="contained" color="primary">
                 <Add />
               </Button>
             </Grid>
-            <Grid item>
+            <Grid>
               <Button onClick={() => setShowExportView(true)} variant="contained" color="primary">
                 <FileUpload />
               </Button>
@@ -169,11 +204,10 @@ const EventsView = ({ user, selectedDate, toggleEventsView }) => {
                 )))}
             </List>
           </div>
-        </>
-      )}
+        </div>
     </Paper>
   );
 };
 
-export default EventsView;
+export default forwardRef(EventsView);
 

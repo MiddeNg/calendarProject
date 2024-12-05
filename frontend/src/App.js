@@ -8,11 +8,32 @@ import { AppBar, Toolbar, Typography, Button } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import { getRedirectResult } from 'firebase/auth';
 import { getAuth } from 'firebase/auth';
+
+function getWindowSize() {
+  switch (true) {
+    case window.innerWidth < 576:
+      return 'sm';
+    case window.innerWidth < 768: 
+      return 'md';
+    case window.innerWidth < 992:
+      return 'lg';
+    default:
+      return 'xl';
+  }
+}
 const App = () => {
   const [user, setUser] = useState(null);
   const [date, setDate] = useState(null);
   const [showSidePanel, setShowSidePanel] = useState(false);
-  React.useEffect(() => {
+  const scrollEventListRef = React.useRef(null);
+
+  const onCalendarClick = (selectedDate) => {
+    console.log(scrollEventListRef.current)
+    scrollEventListRef.current && scrollEventListRef.current.scrollToListItem(selectedDate);
+    setDate(selectedDate);
+  }
+
+  useEffect(() => {
     const debugRedirectResult = async () => {
       try {
         const result = await getRedirectResult(getAuth());
@@ -26,8 +47,9 @@ const App = () => {
     }
     debugRedirectResult()
   }, [])
-    useEffect(() => {
-    setShowSidePanel(user && date);
+
+  useEffect(() => {
+    setShowSidePanel((user && date) ? true : false);
   }, [date, user]);
   const handleLogout = () => {
     logout();
@@ -50,17 +72,18 @@ const App = () => {
       {!user && <Login setUser={setUser} />}
       <div className={`main-content ${user ? 'active' : 'inactive'}`}>
         <Grid container spacing={2}>
-          <Grid item xs={12} size={5.5}>
-            <Calendar date={date} setDate={setDate} openSidePanel={() => setShowSidePanel(true)} />
+          <Grid sm={12} size={5.5}>
+            <Calendar date={date} onCalendarClick={onCalendarClick} openSidePanel={() => setShowSidePanel(true)} />
           </Grid>
-          <Grid item xs={0} size={0.75} sx={{ display: { lg: 'block', md: 'block', xs: 'none' }}}></Grid>
-          <Grid item xs={0} size={5} sx={{ display: { lg: 'block', md: 'block', xs: 'none' } }}>
-              <EventsView user={user} selectedDate={date} toggleEventsView={() => setShowSidePanel(false)} />
-          </Grid>
-        </Grid>
-        <Drawer
+          <Grid sm={0} size={0.75}></Grid>
+          {getWindowSize() !== 'sm' && (<Grid size={5}>
+              <EventsView logined={!!user} selectedDate={date} toggleEventsView={() => setShowSidePanel(false)} 
+                ref={scrollEventListRef}
+              />
+          </Grid>)}
+        </Grid> 
+        {getWindowSize() === 'sm' && <Drawer 
           sx={{
-            display: { lg: 'none', md: 'none', xs: 'block' },
             '& .MuiDrawer-paper': {
               boxSizing: 'border-box',
               overflow: 'hidden',
@@ -74,9 +97,12 @@ const App = () => {
           anchor="bottom"
           open={showSidePanel}
           onClose={() => setShowSidePanel(false)}
+          keepMounted={true} //import for scrolling to work
         >
-          <EventsView user={user} selectedDate={date} toggleEventsView={() => setShowSidePanel(false)}/>
-        </Drawer>
+          <EventsView logined={!!user} selectedDate={date} toggleEventsView={() => setShowSidePanel(false)} 
+            ref={scrollEventListRef}
+          />
+        </Drawer>}
       </div>
     </div>
   );
